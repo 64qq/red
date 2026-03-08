@@ -90,7 +90,7 @@ export class Config {
   }
 
   static readonly defaultConfig: ConfigEntriesWithMeta = {
-    // "$schema": "TODO",
+    $schema: "https://raw.githubusercontent.com/64qq/red/refs/heads/main/src/red.schema.json",
   }
 
   static readonly defaults: Required<CmdLineConfig> = {

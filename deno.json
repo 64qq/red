@@ -1,0 +1,47 @@
+{
+  "license": "MIT",
+  "tasks": {
+    "main": "deno run --allow-sys --allow-env --allow-net=www.desmos.com:443 --allow-read --allow-write src/main.ts",
+    "generate-json-schema": "deno run --allow-sys --allow-env --allow-run --allow-write scripts/generate-json-schema.ts",
+    "check": "deno check src",
+    "build": "deno compile --allow-sys --allow-env --allow-net=www.desmos.com:443 --allow-read --allow-write --no-check --output dist/red src/main.ts"
+  },
+  "version": "0.1.0",
+  "imports": {
+    "@cliffy/command": "jsr:@cliffy/command@^1.0.0",
+    "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0",
+    "@std/fs": "jsr:@std/fs@^1.0.23",
+    "@std/path": "jsr:@std/path@^1.1.4",
+    "@total-typescript/ts-reset": "npm:@total-typescript/ts-reset@^0.6.1",
+    "@valibot/to-json-schema": "jsr:@valibot/to-json-schema@^1.5.0",
+    "jsonc-parser": "npm:jsonc-parser@^3.3.1",
+    "prettier": "npm:prettier@^3.8.1",
+    "ts-regex-builder": "npm:ts-regex-builder@^1.8.2",
+    "valibot": "jsr:@valibot/valibot@^1.2.0",
+    "deno-dom": "jsr:@b-fuze/deno-dom@^0.1.56",
+    "ts-morph": "jsr:@ts-morph/ts-morph@^26.0.0",
+    "@utils/": "./src/utils/"
+  },
+  "fmt": {
+    "lineWidth": 120,
+    "indentWidth": 2,
+    "useTabs": false,
+    "semiColons": false,
+    "exclude": ["./tests/fixtures"]
+  },
+  "lint": {
+    "exclude": ["./tests/fixtures"]
+  },
+  "compilerOptions": {
+    "lib": ["esnext", "deno.ns", "deno.window"],
+
+    "verbatimModuleSyntax": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": true,
+    "exactOptionalPropertyTypes": true
+  }
+}

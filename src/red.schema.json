@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string", "description": "The schema to verify this document against." },
+    "demin": { "type": "boolean", "description": "Whether to run demin on the output." },
+    "prettier": { "type": "boolean", "description": "Whether to run prettier on the output." },
+    "workspaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "demin": { "type": "boolean", "description": "Whether to run demin on the output." },
+          "prettier": { "type": "boolean", "description": "Whether to run prettier on the output." },
+          "pin": { "type": "boolean", "description": "Whether to pull the latest source code or pin the version." },
+          "path": { "type": "string", "description": "Workspace directory path." },
+          "version": { "type": "string", "description": "SHA-1 hash string in the source file name." },
+          "files": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of file paths to be tracked."
+          }
+        },
+        "required": ["path", "version"],
+        "additionalProperties": false
+      },
+      "description": "Separate workspaces for managing different versions of source code."
+    }
+  },
+  "required": [],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

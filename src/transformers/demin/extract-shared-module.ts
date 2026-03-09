@@ -1,5 +1,13 @@
 import { CallExpression, type Node, printNode, SyntaxKind, ts, VariableDeclarationKind } from "ts-morph"
-import { type Export, type FileReplacement, isStringLiteralLike, performFileReplacements, unwrapIIFE } from "./utils.ts"
+import {
+  commitFileReplacements,
+  commitReplacements,
+  type Export,
+  type FileReplacement,
+  isStringLiteralLike,
+  type Replacement,
+  unwrapIIFE,
+} from "./utils.ts"
 import * as path from "@std/path"
 import type { Transformer } from "../mod.ts"
 import { asValidIdentifierName } from "./ecma.ts"
@@ -22,6 +30,7 @@ export const extractSharedModule: Transformer = ({ project, entryFile, cwd, over
   unwrapIIFE(sharedJs)
   const sharedModuleChunkExports = sharedJs.getVariableDeclarationOrThrow("__dcg_chunk_exports__")
   const namedExports: Export[] = []
+  const batchRemove: Replacement[] = []
   sharedModuleChunkExports.findReferencesAsNodes().forEach((ref) => {
     const parent = ref.getParent()
     if (!parent) return
@@ -29,11 +38,23 @@ export const extractSharedModule: Transformer = ({ project, entryFile, cwd, over
       const chunk = extractSharedModuleChunks(ref, parent)
       if (!chunk) return
       namedExports.push(chunk)
-      parent.getParentIfKind(SyntaxKind.ExpressionStatement)?.remove()
+      const stmt = parent.getParentIfKind(SyntaxKind.ExpressionStatement)
+      if (stmt) {
+        batchRemove.push({
+          start: stmt.getStart(),
+          end: stmt.getEnd(),
+          newText: "",
+        })
+      }
     } else if (parent.isKind(SyntaxKind.ReturnStatement)) {
-      parent.remove()
+      batchRemove.push({
+        start: parent.getStart(),
+        end: parent.getEnd(),
+        newText: "",
+      })
     }
   })
+  commitReplacements(sharedJs, batchRemove)
   if (!namedExports.length) throw new Error("Couldn't find any exported shared module chunks.")
 
   const sharedJsExports = sharedJs.addExportDeclaration({ namedExports }).getNamedExports()
@@ -65,7 +86,7 @@ export const extractSharedModule: Transformer = ({ project, entryFile, cwd, over
       })
     })
   })
-  performFileReplacements(sharedJsExportReplacements)
+  commitFileReplacements(sharedJsExportReplacements)
 }
 
 function extractSharedModuleChunks(

@@ -52,16 +52,19 @@ export function applyReplacements(
   )
 }
 
+export function commitReplacements(file: SourceFile, replacements: readonly Replacement[]) {
+  file.replaceWithText(applyReplacements(file.getFullText(), replacements))
+}
+
 export interface FileReplacement extends Replacement {
   file: SourceFile
 }
 
-export function performFileReplacements(
+export function commitFileReplacements(
   fileReplacements: readonly FileReplacement[],
 ): void {
-  Map.groupBy(fileReplacements, ({ file }) => file).forEach((replacements, file) => {
-    file.replaceWithText(applyReplacements(file.getFullText(), replacements))
-  })
+  Map.groupBy(fileReplacements, ({ file }) => file)
+    .forEach((replacements, file) => commitReplacements(file, replacements))
 }
 
 export type Export = OptionalKind<ExportSpecifierStructure>

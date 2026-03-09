@@ -7,9 +7,10 @@ export const prettier: Transformer = async ({ project, cwd }) => {
     ...await resolveConfig(cwd),
   }
   await Promise.all(
-    project.getSourceFiles().map((sourceFile) => {
+    project.getSourceFiles().map(async (sourceFile) => {
       const source = sourceFile.getFullText()
-      return format(source, prettierConfig).then(sourceFile.replaceWithText)
+      const formatted = await format(source, prettierConfig)
+      return sourceFile.replaceWithText(formatted)
     }),
   )
 }

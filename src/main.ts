@@ -14,7 +14,7 @@ import {
   VersionSpecifierSchema,
   type WorkspaceConfig,
 } from "./config.ts"
-import { pick, PrimitiveProxy, type StrictObjectEntry, UnimplementedError } from "@utils/utils.ts"
+import { catchIf, pick, PrimitiveProxy, type StrictObjectEntry, UnimplementedError } from "@utils/utils.ts"
 import denoJson from "../deno.json" with { type: "json" }
 
 class VersionOrURL extends Type<string> {
@@ -163,7 +163,10 @@ export const command = new Command()
         beforeSave: async () => {
           if (!workspaceConfig.files) return
           await Promise.all(
-            workspaceConfig.files.map((file) => Deno.remove(path.resolve(workspace, file))),
+            workspaceConfig.files.map((file) =>
+              Deno.remove(path.resolve(workspace, file))
+                .catch(catchIf(() => {}, [Deno.errors.NotFound]))
+            ),
           )
         },
       })
